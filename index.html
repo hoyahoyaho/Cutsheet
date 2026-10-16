@@ -71,7 +71,8 @@ main.wrap{padding-block:20px 56px;display:flex;flex-direction:column;gap:18px}
 .sw-label{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
 .switcher svg{flex:none;color:var(--muted)}
 .spacer{flex:1}
-.sync{flex:none;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap}
+.sync{flex:none;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap;border:0;background:transparent;padding:6px 4px;border-radius:6px}
+.sync:hover{background:var(--surface-2)}
 .sync i{width:7px;height:7px;border-radius:50%;background:var(--ok);flex:none}
 .sync.busy i{background:var(--warn)}
 .sync.off i{background:var(--muted)}
@@ -273,6 +274,15 @@ main.wrap{padding-block:20px 56px;display:flex;flex-direction:column;gap:18px}
 .kv dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
 .kv dd small{display:block;font-weight:400;color:var(--muted);font-size:12px}
 .row-btns{display:flex;flex-wrap:wrap;gap:8px}
+.acct{display:flex;flex-direction:column;gap:10px;border:1px solid var(--line);border-radius:10px;padding:12px;margin-top:4px;background:var(--bg)}
+.acct-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.acct-who{display:flex;flex-direction:column;min-width:0}
+.acct-who b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.acct-who span{font-size:12.5px;color:var(--muted)}
+.acct p{margin:0;font-size:13.5px;color:var(--muted)}
+.g-btn{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 16px;font-weight:500;font-size:14.5px}
+.g-btn:hover{border-color:var(--muted)}
+.g-btn svg{flex:none}
 .toast{position:fixed;z-index:60;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 20px);background:var(--fg);color:var(--bg);border-radius:10px;padding:10px 14px;display:flex;gap:14px;align-items:center;font-size:14px;box-shadow:var(--shadow);width:max-content;max-width:calc(100% - 32px)}
 .toast button{border:0;background:transparent;color:var(--accent-soft);font-weight:700;padding:2px 4px}
 .copybox textarea{width:100%;min-height:220px;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:10px;font-family:var(--f-mono);font-size:12.5px;line-height:1.5;resize:vertical}
@@ -298,6 +308,7 @@ main.wrap{padding-block:20px 56px;display:flex;flex-direction:column;gap:18px}
 <div id="layer" hidden></div>
 <input type="file" id="importFile" accept=".json,application/json" hidden>
 
+<script src="config.js"></script>
 <script>
 (() => {
 'use strict';
@@ -390,6 +401,8 @@ const ICON = {
   copy: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>',
   dl: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10.5 12 15.5l5-5M5 20h14"/></svg>',
   box: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg>',
+  cloud: '<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.1 4.75 4.75 0 0 0 7 18.5z"/><path d="m9.5 13.5 2.5 2.5 2.5-2.5M12 16V10.5"/></svg>',
+  google: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>',
 };
 
 /* ---------- state ---------- */
@@ -418,6 +431,22 @@ const S = {
 };
 const timers = {}, inflight = {}, again = {}, seq = {};
 const dirty = new Set();
+let tombs = {};          // id -> time a project was deleted on this device
+let composing = false, pendingRender = false;
+
+/* cloud sync (Firebase): optional, turned on by config.js */
+const SYNC = {
+  enabled: false,        // config.js has a Firebase config
+  ready: false,          // library loaded and initialised
+  FB: null, auth: null, fs: null,
+  user: null,
+  state: 'idle',         // idle | syncing | synced | offline | error
+  msg: '',
+  lastSync: null,
+  unsub: null,
+  initialDone: false,
+  timers: {},
+};
 
 /* ---------- helpers ---------- */
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -612,6 +641,7 @@ async function flush(id) {
   try {
     await store.put(JSON.parse(JSON.stringify(p)));
     if (seq[id] === mySeq) dirty.delete(id);
+    scheduleRemote(id);
     if (S.sync !== 'error' || store.kind !== 'memory') { S.sync = 'saved'; S.syncMsg = ''; }
   } catch (e) {
     const prevMsg = S.sync === 'error' ? S.syncMsg : '';
@@ -627,12 +657,166 @@ async function flush(id) {
     updateSync();
   }
 }
-function flushAll() { [...dirty].forEach(id => flush(id)); }
+function flushAll() { [...dirty].forEach(id => flush(id)); flushRemoteAll(); }
 function removeProject(id) {
   clearTimeout(timers[id]); timers[id] = null; dirty.delete(id);
+  clearTimeout(SYNC.timers[id]); delete SYNC.timers[id];
   S.projects.delete(id);
   store.del(id).catch(() => toast('삭제를 저장하지 못했어요. 앱을 다시 열어 확인해 주세요.'));
+  tombs[id] = Date.now();
+  store.setMeta('tombs', tombs).catch(() => {});
+  pushTomb(id);
 }
+
+/* ---------- cloud sync ---------- */
+const clone = o => JSON.parse(JSON.stringify(o));
+function remoteRef(id) { return SYNC.FB.doc(SYNC.fs, 'users', SYNC.user.uid, 'projects', id); }
+function canPush() { return SYNC.ready && SYNC.user && SYNC.fs; }
+function scheduleRemote(id) {
+  if (!canPush()) return;
+  clearTimeout(SYNC.timers[id]);
+  SYNC.timers[id] = setTimeout(() => pushProject(id), 1500);
+}
+function flushRemoteAll() {
+  if (!canPush()) return;
+  Object.keys(SYNC.timers).forEach(id => { if (SYNC.timers[id]) pushProject(id); });
+}
+function pushProject(id) {
+  clearTimeout(SYNC.timers[id]); delete SYNC.timers[id];
+  if (!canPush()) return;
+  const p = S.projects.get(id);
+  if (!p) return;
+  setSyncState('syncing');
+  // Firestore queues this on the device while offline and sends it once connected.
+  SYNC.FB.setDoc(remoteRef(id), clone(p)).catch(syncFailed);
+}
+function pushTomb(id) {
+  if (!canPush()) return;
+  SYNC.FB.setDoc(remoteRef(id), { deleted: true, updatedAt: tombs[id] || Date.now() }).catch(syncFailed);
+}
+function syncFailed(e) {
+  const code = e && e.code;
+  SYNC.state = 'error';
+  SYNC.msg = code === 'permission-denied' ? '동기화 권한이 없어요. Firebase의 Firestore 규칙을 확인해 주세요.'
+    : code === 'resource-exhausted' ? '오늘 쓸 수 있는 무료 동기화 한도를 다 썼어요. 내용은 이 기기에 계속 저장돼요.'
+    : '동기화 중 문제가 생겼어요. 내용은 이 기기에 계속 저장돼요.';
+  updateSync();
+}
+function setSyncState(st) { if (SYNC.state !== 'error' || st === 'synced') { SYNC.state = st; if (st === 'synced') SYNC.msg = ''; } updateSync(); }
+function applyRemote(id, d) {
+  if (!d || typeof d !== 'object' || dirty.has(id) || SYNC.timers[id]) return false;
+  const rUpdated = num(d.updatedAt, 0, 0, 1e15);
+  const local = S.projects.get(id);
+  if (d.deleted) {
+    if (local && local.updatedAt <= rUpdated) {
+      S.projects.delete(id); store.del(id).catch(() => {});
+      tombs[id] = rUpdated; store.setMeta('tombs', tombs).catch(() => {});
+      return true;
+    }
+    return false;
+  }
+  if (tombs[id] && tombs[id] >= rUpdated) return false;
+  if (local && local.updatedAt >= rUpdated) return false;
+  const p = normalize(d, id);
+  S.projects.set(id, p);
+  store.put(clone(p)).catch(() => {});
+  return true;
+}
+function uploadNewer(snap) {
+  const remote = {};
+  snap.docs.forEach(ds => { const d = ds.data(); remote[ds.id] = d; });
+  for (const p of S.projects.values()) {
+    const r = remote[p.id];
+    if (!r || (!r.deleted && num(r.updatedAt, 0, 0, 1e15) < p.updatedAt) || (r.deleted && num(r.updatedAt, 0, 0, 1e15) < p.updatedAt)) pushProject(p.id);
+  }
+  for (const id of Object.keys(tombs)) {
+    const r = remote[id];
+    if (r && !r.deleted && num(r.updatedAt, 0, 0, 1e15) <= tombs[id]) pushTomb(id);
+  }
+}
+function startListening() {
+  stopListening();
+  SYNC.initialDone = false;
+  setSyncState('syncing');
+  const col = SYNC.FB.collection(SYNC.fs, 'users', SYNC.user.uid, 'projects');
+  SYNC.unsub = SYNC.FB.onSnapshot(col, { includeMetadataChanges: true }, snap => {
+    let changed = false;
+    for (const ch of snap.docChanges()) {
+      if (ch.type === 'removed' || ch.doc.metadata.hasPendingWrites) continue;
+      changed = applyRemote(ch.doc.id, ch.doc.data()) || changed;
+    }
+    if (!snap.metadata.fromCache) {
+      SYNC.lastSync = Date.now();
+      if (!SYNC.initialDone) { SYNC.initialDone = true; uploadNewer(snap); }
+    }
+    if (changed) pickCurrent();
+    setSyncState(snap.metadata.hasPendingWrites ? 'syncing' : (snap.metadata.fromCache || !S.online) ? 'offline' : 'synced');
+    if (changed) renderSafe();
+  }, err => { syncFailed(err); });
+}
+function stopListening() { if (SYNC.unsub) { try { SYNC.unsub(); } catch (e) { /* ignore */ } SYNC.unsub = null; } }
+function loadFirebaseLib() {
+  return new Promise((res, rej) => {
+    if (window.FB) { res(window.FB); return; }
+    const s = document.createElement('script');
+    s.src = 'firebase.js';
+    s.onload = () => window.FB ? res(window.FB) : rej(new Error('no FB'));
+    s.onerror = () => rej(new Error('load failed'));
+    document.head.appendChild(s);
+  });
+}
+async function initSync() {
+  const cfg = window.CUTSHEET_FIREBASE;
+  if (!cfg || typeof cfg !== 'object' || !cfg.apiKey || !cfg.projectId) return;
+  SYNC.enabled = true; updateSync();
+  try {
+    const FB = await loadFirebaseLib();
+    SYNC.FB = FB;
+    const app = FB.initializeApp(cfg);
+    SYNC.auth = FB.getAuth(app);
+    try { SYNC.fs = FB.initializeFirestore(app, { localCache: FB.persistentLocalCache({ tabManager: FB.persistentMultipleTabManager() }) }); }
+    catch (e) { SYNC.fs = FB.getFirestore(app); }
+    SYNC.ready = true;
+    FB.getRedirectResult(SYNC.auth).catch(e => signInFailed(e));
+    FB.onAuthStateChanged(SYNC.auth, user => {
+      SYNC.user = user || null;
+      if (user) startListening(); else { stopListening(); SYNC.state = 'idle'; }
+      renderSafe();
+    });
+  } catch (e) {
+    SYNC.state = 'error';
+    SYNC.msg = '동기화 기능을 불러오지 못했어요. 인터넷에 연결된 상태에서 앱을 한 번 다시 열어 주세요.';
+    updateSync();
+  }
+}
+function signIn() {
+  if (!SYNC.ready) { toast('동기화 기능을 아직 불러오는 중이에요. 잠시 후 다시 눌러 주세요.'); return; }
+  if (!S.online) { toast('로그인은 인터넷에 연결된 상태에서 해 주세요.'); return; }
+  const provider = new SYNC.FB.GoogleAuthProvider();
+  provider.setCustomParameters({ prompt: 'select_account' });
+  SYNC.FB.signInWithPopup(SYNC.auth, provider).then(() => toast('로그인했어요. 이제 같은 계정의 기기끼리 자동으로 맞춰져요.')).catch(e => {
+    const code = e && e.code;
+    if (code === 'auth/popup-blocked' || code === 'auth/operation-not-supported-in-this-environment') {
+      SYNC.FB.signInWithRedirect(SYNC.auth, provider).catch(signInFailed);
+      return;
+    }
+    signInFailed(e);
+  });
+}
+function signInFailed(e) {
+  const code = e && e.code;
+  if (!code || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request' || code === 'auth/user-cancelled') return;
+  if (code === 'auth/unauthorized-domain') toast(`Firebase 승인된 도메인에 ${location.hostname}을 추가해 주세요.`);
+  else if (code === 'auth/operation-not-allowed') toast('Firebase에서 Google 로그인을 사용 설정해 주세요.');
+  else if (code === 'auth/network-request-failed') toast('인터넷에 연결된 상태에서 다시 로그인해 주세요.');
+  else toast('로그인하지 못했어요. (' + code + ')');
+}
+function signOutSync() {
+  if (!SYNC.ready) return;
+  flushRemoteAll();
+  SYNC.FB.signOut(SYNC.auth).then(() => toast('로그아웃했어요. 이 기기의 내용은 그대로 남아 있어요.')).catch(() => {});
+}
+function renderSafe() { if (composing) pendingRender = true; else render(); }
 function pickCurrent() {
   if (S.currentId && S.projects.has(S.currentId)) return;
   const list = [...S.projects.values()].sort((a, b) => b.updatedAt - a.updatedAt);
@@ -650,6 +834,14 @@ async function requestPersist() {
 function syncView() {
   if (S.phase !== 'ready') return { cls: 'busy', text: '여는 중' };
   if (S.sync === 'error') return { cls: 'err', text: '저장 안 됨' };
+  if (SYNC.enabled) {
+    if (!SYNC.user) return { cls: 'off', text: SYNC.ready ? '로그인하면 동기화' : '기기에 저장됨' };
+    if (!S.online) return { cls: 'off', text: '오프라인 · 기기에 저장' };
+    if (SYNC.state === 'error') return { cls: 'err', text: '동기화 오류' };
+    if (SYNC.state === 'syncing' || S.sync === 'saving') return { cls: 'busy', text: '동기화 중…' };
+    if (SYNC.state === 'offline') return { cls: 'off', text: '연결 기다리는 중' };
+    return { cls: '', text: '동기화됨' };
+  }
   if (S.sync === 'saving') return { cls: 'busy', text: '저장 중…' };
   return S.online ? { cls: '', text: '기기에 저장됨' } : { cls: 'off', text: '오프라인 · 저장됨' };
 }
@@ -658,7 +850,7 @@ function updateSync() {
   if (!el) return;
   const v = syncView();
   el.className = 'sync ' + v.cls;
-  el.title = S.syncMsg || v.text;
+  el.title = SYNC.msg || S.syncMsg || v.text;
   el.innerHTML = '<i aria-hidden="true"></i><span>' + v.text + '</span>';
 }
 function headerHTML() {
@@ -670,8 +862,8 @@ function headerHTML() {
   return `<header class="top"><div class="wrap">
     <div class="brand">${ICON.slate}<span>컷시트</span></div>
     ${sw}
-    <div id="sync" class="sync ${v.cls}" title="${esc(S.syncMsg || v.text)}"><i aria-hidden="true"></i><span>${v.text}</span></div>
-    ${S.phase === 'ready' ? `<button class="icon-btn" data-act="backup" aria-label="백업과 저장 공간" title="백업과 저장 공간">${ICON.box}</button>` : ''}
+    <button id="sync" type="button" class="sync ${v.cls}" data-act="backup" title="${esc(SYNC.msg || S.syncMsg || v.text)}"><i aria-hidden="true"></i><span>${v.text}</span></button>
+    ${S.phase === 'ready' ? `<button class="icon-btn" data-act="backup" aria-label="동기화와 백업" title="동기화와 백업">${SYNC.enabled ? ICON.cloud : ICON.box}</button>` : ''}
   </div></header>`;
 }
 function tplGrid() {
@@ -799,7 +991,7 @@ function notesHTML(p) {
   </div>`;
 }
 function backupNudge() {
-  if (!S.projects.size) return '';
+  if (!S.projects.size || SYNC.user) return '';
   if (!S.lastBackup) return ' 아직 백업 파일을 만든 적이 없어요. <button class="linkish" data-act="backup">백업하기</button>';
   const { days } = fmtWhen(S.lastBackup);
   return days >= 7 ? ` 마지막 백업이 ${days}일 전이에요. <button class="linkish" data-act="backup">백업하기</button>` : '';
@@ -862,9 +1054,31 @@ function backupSheetHTML() {
   const persist = S.persisted === true ? '켜짐<small>공간이 부족해져도 자동으로 지우지 않아요</small>'
     : S.persisted === false ? '꺼짐<small>홈 화면 아이콘으로 열면 켜질 수 있어요</small>'
     : '확인 안 됨';
+  let acct = '';
+  if (SYNC.enabled) {
+    const u = SYNC.user;
+    const v = syncView();
+    const last = SYNC.lastSync ? fmtWhen(SYNC.lastSync).base : '';
+    acct = u
+      ? `<div class="acct">
+          <div class="acct-row">
+            <div class="acct-who"><b>${esc(u.email || u.displayName || '구글 계정')}</b><span>${esc(v.text)}${last ? ' · 마지막 동기화 ' + last : ''}</span></div>
+            <button class="btn ghost" data-act="signout">로그아웃</button>
+          </div>
+          ${SYNC.state === 'error' && SYNC.msg ? `<p class="warn-text">${esc(SYNC.msg)}</p>` : ''}
+          <p>같은 구글 계정으로 로그인한 폰과 태블릿은 자동으로 내용이 맞춰져요. 오프라인에서 고친 내용은 인터넷이 연결되면 올라가요.</p>
+        </div>`
+      : `<div class="acct">
+          <p>구글 계정으로 로그인하면 폰과 태블릿의 기획 내용이 자동으로 맞춰져요. 로그인은 인터넷이 될 때 한 번만 하면 돼요.</p>
+          <div class="acct-row"><button class="g-btn" data-act="signin"${SYNC.ready ? '' : ' disabled'}>${ICON.google}<span>${SYNC.ready ? 'Google로 로그인' : '동기화 준비 중…'}</span></button></div>
+          ${SYNC.state === 'error' && SYNC.msg ? `<p class="warn-text">${esc(SYNC.msg)}</p>` : ''}
+        </div>`;
+  }
   return `<div class="scrim" data-act="close-sheet"></div>
-  <div class="sheet" role="dialog" aria-modal="true" aria-label="백업과 저장 공간">
-    <div class="sheet-head"><h2>백업 · 저장 공간</h2><button class="icon-btn" data-act="close-sheet" aria-label="닫기">${ICON.x}</button></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="${SYNC.enabled ? '동기화와 백업' : '백업과 저장 공간'}">
+    <div class="sheet-head"><h2>${SYNC.enabled ? '동기화 · 백업' : '백업 · 저장 공간'}</h2><button class="icon-btn" data-act="close-sheet" aria-label="닫기">${ICON.x}</button></div>
+    ${acct}
+    ${SYNC.enabled ? '<h3 class="sheet-sub">이 기기</h3>' : ''}
     <dl class="kv">
       <div><dt>저장된 프로젝트</dt><dd>${all.length}개 · ${fmtBytes(dataSize)}</dd></div>
       <div><dt>앱 전체 사용량</dt><dd>${est ? fmtBytes(est.usage) : '계산 중'}<small>글꼴 · 앱 파일 포함</small></dd></div>
@@ -872,7 +1086,7 @@ function backupSheetHTML() {
       <div><dt>저장 보호</dt><dd>${persist}</dd></div>
       <div><dt>마지막 백업</dt><dd>${when ? `${when.base}<small>${when.days ? when.days + '일 전' : '오늘'}</small>` : '없음'}</dd></div>
     </dl>
-    <p class="sheet-p">모든 내용은 이 기기 안에만 저장돼요. 폰과 태블릿 사이로 옮기거나, 앱을 지우거나 기기를 바꾸기 전에는 백업 파일을 만들어 두세요.</p>
+    <p class="sheet-p">${SYNC.user ? '백업 파일은 만약을 위한 예비용이에요. 한 달에 한 번쯤 만들어 두면 안심이에요.' : '로그인하지 않으면 내용은 이 기기 안에만 저장돼요. 다른 기기로 옮기거나, 앱을 지우거나 기기를 바꾸기 전에는 백업 파일을 만들어 두세요.'}</p>
     <div class="row-btns">
       <button class="btn primary" data-act="export-all"${all.length ? '' : ' disabled'}>${ICON.dl}<span>백업 파일 만들기</span></button>
       <button class="btn" data-act="import">백업 파일 불러오기</button>
@@ -1023,7 +1237,7 @@ async function importFile(file) {
     const ex = S.projects.get(id);
     if (ex && ex.updatedAt >= p.updatedAt) { kept++; continue; }
     S.projects.set(id, p);
-    try { await store.put(JSON.parse(JSON.stringify(p))); ex ? updated++ : added++; }
+    try { await store.put(JSON.parse(JSON.stringify(p))); ex ? updated++ : added++; scheduleRemote(id); }
     catch (e) { failed++; }
   }
   pickCurrent(); S.sheet = null; render();
@@ -1151,6 +1365,8 @@ $app.addEventListener('change', e => {
   else return;
   touch(p); render();
 });
+$app.addEventListener('compositionstart', () => { composing = true; });
+$app.addEventListener('compositionend', () => { composing = false; if (pendingRender) { pendingRender = false; setTimeout(render, 0); } });
 $app.addEventListener('keydown', e => {
   if (e.key !== 'Enter' || e.isComposing || e.keyCode === 229) return;
   if (e.target.id === 'chkNew') { e.preventDefault(); const p = cur(); if (p) addChecklist(p); }
@@ -1171,6 +1387,9 @@ function onClick(e) {
     case 'tab': S.tab = b.dataset.v; saveUI(); render(); return;
     case 'jump': jumpTo(b.dataset.cid); return;
     case 'export-all': exportAll(); return;
+    case 'reload': flushAll(); $toast.hidden = true; setTimeout(() => location.reload(), 350); return;
+    case 'signin': signIn(); return;
+    case 'signout': signOutSync(); return;
     case 'import': $file.value = ''; $file.click(); return;
     case 'undo': {
       const u = S.undo; S.undo = null; $toast.hidden = true;
@@ -1246,12 +1465,24 @@ window.addEventListener('offline', () => { S.online = false; updateSync(); });
   try { list = await store.loadAll(); } catch (e) { list = []; }
   (list || []).forEach(d => { if (d && typeof d.id === 'string') S.projects.set(d.id, normalize(d, d.id)); });
   try { S.lastBackup = await store.getMeta('lastBackup'); } catch (e) { S.lastBackup = null; }
+  try { const t = await store.getMeta('tombs'); if (t && typeof t === 'object') tombs = t; } catch (e) { tombs = {}; }
   if (store.kind === 'memory') { S.sync = 'error'; S.syncMsg = '이 브라우저에서는 기기에 저장할 수 없어요. 사생활 보호 모드라면 일반 모드로 열어 주세요.'; }
   S.phase = 'ready';
   pickCurrent();
   render();
   if (S.projects.size) requestPersist();
+  initSync();
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    // A new version was installed: offer a reload instead of interrupting typing.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloaded) return;
+      reloaded = true;
+      clearTimeout(toastTimer);
+      $toast.innerHTML = '<span>앱이 새 버전으로 업데이트됐어요</span><button type="button" data-act="reload">새로고침</button>';
+      $toast.hidden = false;
+    });
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
 })();
