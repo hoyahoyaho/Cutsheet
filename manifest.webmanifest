@@ -1,0 +1,18 @@
+{
+  "name": "컷시트",
+  "short_name": "컷시트",
+  "description": "컷별 스토리보드와 러닝타임으로 영상 편집을 기획하는 오프라인 앱",
+  "lang": "ko",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#ECEEF2",
+  "theme_color": "#F9FAFC",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
