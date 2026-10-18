@@ -210,9 +210,27 @@ main.wrap{padding-block:20px 56px;display:flex;flex-direction:column;gap:18px}
 .chk-add{display:flex;gap:8px;margin-top:10px}
 .chk-add input{flex:1;min-width:0;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 12px}
 
+/* plan */
+.plan{display:flex;flex-direction:column;gap:18px}
+.plan-intro{margin:0;font-size:13.5px;color:var(--muted);max-width:62ch}
+.plan .fl{gap:3px}
+.pf-head{display:flex;align-items:center;gap:8px;min-height:30px}
+.pf-label{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;color:var(--fg);min-width:0}
+.pf-label i{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--muted);flex:none}
+.pf.filled .pf-label i{background:var(--ok);border-color:var(--ok)}
+.plan .fl>span.pf-hint{font-size:12.5px;font-weight:400;letter-spacing:0;margin-bottom:5px;padding-left:16px}
+.zoom-btn{margin-left:auto;padding:4px 10px;font-size:12.5px;gap:5px;color:var(--muted);flex:none}
+.zoom-btn:hover{color:var(--fg)}
+.pf.zoomed{position:fixed;inset:0;z-index:55;background:var(--surface);gap:6px;
+  padding-top:calc(env(safe-area-inset-top,0px) + 12px);padding-bottom:calc(env(safe-area-inset-bottom,0px) + 16px);
+  padding-left:max(16px,env(safe-area-inset-left,0px),calc(50vw - 380px));padding-right:max(16px,env(safe-area-inset-right,0px),calc(50vw - 380px))}
+.pf.zoomed .pf-label{font-size:18px}
+.pf.zoomed .zoom-btn{color:var(--fg);border-color:var(--muted)}
+.plan .pf.zoomed textarea{flex:1;height:auto!important;min-height:0;overflow:auto;font-size:17px;line-height:1.8;padding:14px 16px;background:var(--bg)}
+
 /* notes */
 .notes{display:flex;flex-direction:column;gap:14px}
-.notes .fl textarea{background:var(--surface);border-color:var(--line);min-height:76px}
+.notes .fl textarea,.plan .fl textarea{background:var(--surface);border-color:var(--line);min-height:76px}
 .refs{list-style:none;margin:-6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:13.5px}
 .refs a{color:var(--accent);text-decoration:none;word-break:break-all}
 .refs a:hover{text-decoration:underline}
@@ -333,6 +351,15 @@ const FORMATS = [
   { id: '1:1',  label: '정사각 1:1', w: 11, h: 11 },
 ];
 const FPS = [24, 25, 30, 60];
+const PLAN = [
+  { id: 'feel', label: '영상을 보고 느끼게 하고 싶은 것', hint: '보고 난 뒤 시청자에게 남았으면 하는 감정이나 생각', ph: '예: 조용히 위로받는 느낌, 나도 저기 가보고 싶다는 설렘' },
+  { id: 'look', label: '원하는 색감 · 움직임', hint: '색보정 톤과 카메라가 움직이는 방식', ph: '예: 따뜻한 필름톤에 그림자는 살짝 푸르게 · 느린 핸드헬드, 짐벌로 천천히 밀고 들어가기' },
+  { id: 'music', label: '음악 방향', hint: '장르, 템포, 구간별 분위기 변화 (구체적인 곡 후보는 메모 탭에)', ph: '예: 잔잔한 어쿠스틱으로 시작해 하이라이트에서 비트가 들어오는 구성' },
+  { id: 'story', label: '스토리 구성 · 나레이션', hint: '이야기가 흘러가는 순서와 나레이션의 말투', ph: '예: 일상 → 떠남 → 풍경 → 여운 · 1인칭으로 담담하게, 문장은 짧게', zoom: true },
+  { id: 'shoot', label: '장비 · 로케이션 · 촬영 시간대', hint: '무엇으로, 어디서, 언제 찍을지', ph: '예: 미러리스 + 35mm 렌즈, 짐벌 · 한강공원 망원지구 · 일몰 30분 전 골든아워' },
+];
+const emptyPlan = () => Object.fromEntries(PLAN.map(f => [f.id, '']));
+const planFilled = p => PLAN.filter(f => p.plan[f.id].trim()).length;
 
 const CHECK_LONG = ['소스 백업 · 폴더 정리', '가편집 (컷 순서 맞추기)', '컷편집 (호흡 · 점프컷 다듬기)', '자막 넣고 오탈자 검수', 'BGM · 효과음 저작권 확인', '오디오 레벨 맞추기 (-14 LUFS 기준)', '색보정', '썸네일 만들기 (1280×720)', '제목 · 설명 · 태그 작성', '최종 검수 후 업로드 예약'];
 const CHECK_SHORT = ['소스 백업', '첫 2초 훅 다시 보기', '자막 크게 · 안전영역 안에 배치', 'BGM 음원 사용 가능 여부 확인', '오디오 레벨 맞추기', '커버 프레임 고르기', '설명 · 해시태그 작성', '업로드'];
@@ -373,6 +400,13 @@ const TEMPLATES = [
   { id: 'example', name: '예시 둘러보기', desc: '다 채워진 제주 여행 브이로그 기획안', title: '제주 가을 3박 4일 브이로그', example: true, dueInDays: 14, format: '16:9', fps: 30, target: 480, check: CHECK_LONG, checkDone: 2,
     concept: '억새 시즌 제주를 처음 가는 사람에게 동선과 분위기를 한 번에 보여주는 여행 브이로그',
     notes: { bgm: '오프닝: 잔잔한 어쿠스틱 기타\n하이라이트: 피아노와 스트링이 쌓이는 곡\n먹방: 로파이 비트', refs: '', memo: '드론 비행 가능 구역 미리 확인하기\n억새는 역광일 때 가장 예쁘게 나옴' },
+    plan: {
+      feel: '억새 사이를 천천히 걷는 듯한 여유. 보고 나면 이번 가을에 제주에 가고 싶어지는 마음',
+      look: '따뜻하고 살짝 바랜 필름톤, 억새는 역광으로 금빛이 돌게 · 이동 구간은 가벼운 핸드헬드, 오름 정상은 드론으로 천천히 상승',
+      music: '잔잔한 어쿠스틱 기타로 시작해 새별오름에서 피아노와 스트링이 쌓이며 커지고, 먹방 구간은 로파이 비트로 템포 전환',
+      story: '도착의 설렘 (Day 1 동쪽) → 성산일출봉 오르기 → 새별오름 억새와 일몰로 감정 정점 → 서쪽 바다와 오일장으로 가볍게 → 공항 가는 길의 여운\n나레이션은 1인칭, 친구에게 말하듯 짧고 담담하게',
+      shoot: '미러리스 + 24-70mm, 드론, 짐벌, 핀마이크 · 성산일출봉, 새별오름, 협재 해변, 오일장 · 성산은 이른 오전, 새별오름은 일몰 1시간 전 도착',
+    },
     cuts: [
     { section: 'open', dur: 6, visual: '새별오름 억새 드론샷 → 해 질 녘 바다 → 흑돼지 굽는 장면 (3컷 빠르게)', audio: '"10월 제주는 억새 보러 가는 거예요"', fx: '휩 전환 · 바람 효과음', source: 'DJI_0042 00:10~ / C015', status: 'done' },
     { section: 'open', dur: 4, visual: '타이틀 카드: 제주 가을 3박 4일', fx: '타이틀 키네틱 타이포 · 효과음 하나', status: 'edit' },
@@ -400,6 +434,8 @@ const ICON = {
   check: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   copy: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>',
   dl: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10.5 12 15.5l5-5M5 20h14"/></svg>',
+  expand: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>',
+  shrink: '<svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"/></svg>',
   box: '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6M4.5 12v6c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8v-6"/></svg>',
   cloud: '<svg viewBox="0 0 24 24" width="21" height="21" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A6 6 0 0 0 6.6 9.1 4.75 4.75 0 0 0 7 18.5z"/><path d="m9.5 13.5 2.5 2.5 2.5-2.5M12 16V10.5"/></svg>',
   google: '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>',
@@ -428,6 +464,7 @@ const S = {
   estimate: null,
   lastBackup: null,
   undo: null,
+  zoom: null,         // id of the plan field shown full screen
 };
 const timers = {}, inflight = {}, again = {}, seq = {};
 const dirty = new Set();
@@ -532,6 +569,7 @@ function normCut(c) {
 function normalize(d, id) {
   const n = d && typeof d === 'object' ? d : {};
   const notes = n.notes && typeof n.notes === 'object' ? n.notes : {};
+  const plan = n.plan && typeof n.plan === 'object' ? n.plan : {};
   return {
     id,
     title: str(n.title).slice(0, 120),
@@ -542,6 +580,7 @@ function normalize(d, id) {
     concept: str(n.concept),
     cuts: Array.isArray(n.cuts) ? n.cuts.filter(c => c && typeof c === 'object').slice(0, 500).map(normCut) : [],
     checklist: Array.isArray(n.checklist) ? n.checklist.filter(k => k && typeof k === 'object').slice(0, 200).map(k => ({ id: str(k.id) || uid(), text: str(k.text), done: !!k.done })) : [],
+    plan: Object.fromEntries(PLAN.map(f => [f.id, str(plan[f.id])])),
     notes: { bgm: str(notes.bgm), refs: str(notes.refs), memo: str(notes.memo) },
     createdAt: num(n.createdAt, Date.now(), 0, 1e15),
     updatedAt: num(n.updatedAt, Date.now(), 0, 1e15),
@@ -556,6 +595,7 @@ function fromTemplate(t) {
     id: uid(), title: t.title, format: t.format, fps: t.fps, target: t.target, due, concept: t.concept || '',
     cuts: t.cuts.map(c => newCut(c)),
     checklist: t.check.map((text, i) => ({ id: uid(), text, done: i < (t.checkDone || 0) })),
+    plan: { ...emptyPlan(), ...(t.plan || {}) },
     notes: { bgm: '', refs: '', memo: '', ...(t.notes || {}) },
     createdAt: now, updatedAt: now, example: !!t.example,
   };
@@ -620,7 +660,7 @@ const store = {
 
 function saveUI() { lsSet(LS_UI, JSON.stringify({ currentId: S.currentId, tab: S.tab })); }
 function loadUI() {
-  try { const u = JSON.parse(lsGet(LS_UI) || '{}'); if (typeof u.currentId === 'string') S.currentId = u.currentId; if (['cuts', 'check', 'notes'].includes(u.tab)) S.tab = u.tab; } catch (e) { /* ignore */ }
+  try { const u = JSON.parse(lsGet(LS_UI) || '{}'); if (typeof u.currentId === 'string') S.currentId = u.currentId; if (['plan', 'cuts', 'check', 'notes'].includes(u.tab)) S.tab = u.tab; } catch (e) { /* ignore */ }
 }
 
 function touch(p) {
@@ -982,6 +1022,20 @@ function refsHTML(p) {
   const urls = [...new Set(p.notes.refs.match(/https?:\/\/[^\s<>"']+/g) || [])].slice(0, 20);
   return urls.map(u => `<li><a href="${esc(u)}" target="_blank" rel="noopener noreferrer">${esc(shortUrl(u))}</a></li>`).join('');
 }
+function planHTML(p) {
+  return `<div class="plan">
+    <p class="plan-intro">촬영 전에 영상의 방향을 정해 두는 곳이에요. 적어 둔 내용은 '텍스트로 복사'에도 함께 들어가요.</p>
+    ${PLAN.map(f => {
+      const z = S.zoom === f.id;
+      const zoomBtn = f.zoom ? `<button type="button" class="btn zoom-btn" data-act="zoom" data-v="${f.id}" data-k="b:zoom:${f.id}" aria-pressed="${z}" title="${z ? '원래 크기로 (Esc)' : '화면 전체로 크게 쓰기'}">${z ? ICON.shrink + '<span>축소</span>' : ICON.expand + '<span>전체 화면</span>'}</button>` : '';
+      return `<div class="fl pf${p.plan[f.id].trim() ? ' filled' : ''}${z ? ' zoomed' : ''}"${z ? ` role="dialog" aria-modal="true" aria-label="${f.label}"` : ''}>
+      <div class="pf-head"><label class="pf-label" for="plan-${f.id}"><i aria-hidden="true"></i>${f.label}</label>${zoomBtn}</div>
+      <span class="pf-hint" id="hint-${f.id}">${f.hint}</span>
+      <textarea id="plan-${f.id}" data-k="plan:${f.id}" rows="3" aria-describedby="hint-${f.id}" placeholder="${esc(f.ph)}">${esc(p.plan[f.id])}</textarea>
+    </div>`;
+    }).join('')}
+  </div>`;
+}
 function notesHTML(p) {
   return `<div class="notes">
     <label class="fl"><span>BGM · 효과음 후보</span><textarea data-k="notes:bgm" rows="3" placeholder="곡명 · 출처 · 쓸 구간 (저작권 확인)">${esc(p.notes.bgm)}</textarea></label>
@@ -1000,8 +1054,8 @@ function projectHTML(p) {
   const dd = dday(p.due);
   const ddCls = dd ? (dd.diff < 0 ? ' late' : dd.diff <= 3 ? ' soon' : '') : '';
   const doneChk = p.checklist.filter(k => k.done).length;
-  const tabs = [['cuts', '컷 구성', p.cuts.length], ['check', '체크리스트', doneChk + '/' + p.checklist.length], ['notes', '메모 · 레퍼런스', '']];
-  const body = S.tab === 'check' ? checkHTML(p) : S.tab === 'notes' ? notesHTML(p) : cutsHTML(p);
+  const tabs = [['plan', '기획', planFilled(p) + '/' + PLAN.length], ['cuts', '컷 구성', p.cuts.length], ['check', '체크리스트', doneChk + '/' + p.checklist.length], ['notes', '메모 · 레퍼런스', '']];
+  const body = S.tab === 'plan' ? planHTML(p) : S.tab === 'check' ? checkHTML(p) : S.tab === 'notes' ? notesHTML(p) : cutsHTML(p);
   return `<div class="side">
   ${S.sync === 'error' ? `<div class="notice">${esc(S.syncMsg)}</div>` : ''}
   <section class="slate">
@@ -1028,7 +1082,7 @@ function projectHTML(p) {
   </section>
   </div>
   <div class="content">
-  <nav class="tabs" role="tablist" aria-label="기획 영역">${tabs.map(([id, label, n]) => `<button role="tab" data-act="tab" data-v="${id}" aria-selected="${S.tab === id}">${label}${n !== '' ? ` <b>${n}</b>` : ''}</button>`).join('')}</nav>
+  <nav class="tabs" role="tablist" aria-label="기획 영역">${tabs.map(([id, label, n]) => `<button role="tab" data-act="tab" data-v="${id}" aria-selected="${S.tab === id}">${label}${n !== '' ? ` <b${id === 'plan' ? ' id="planCount"' : ''}>${n}</b>` : ''}</button>`).join('')}</nav>
   <div class="panel" role="tabpanel">${body}</div>
   </div>`;
 }
@@ -1121,7 +1175,7 @@ function render() {
       if (ss != null) { try { el.setSelectionRange(ss, se); } catch (e) { /* ignore */ } }
     }
   }
-  document.documentElement.classList.toggle('lock', !!S.sheet);
+  document.documentElement.classList.toggle('lock', !!S.sheet || !!(S.zoom && S.tab === 'plan' && cur()));
 }
 function refreshDerived(p) {
   const t = document.getElementById('timeline');
@@ -1168,6 +1222,8 @@ function exportText(p) {
   L.push(`${p.format} · ${p.fps}fps · 목표 ${mmss(p.target)} · 현재 ${mmss(total)} (${p.cuts.length}컷)`);
   if (p.due) L.push(`마감 ${p.due} (${dday(p.due).label})`);
   if (p.concept.trim()) L.push(`기획 의도: ${oneLine(p.concept)}`);
+  const planLines = PLAN.filter(f => p.plan[f.id].trim()).map(f => `${f.label}: ${oneLine(p.plan[f.id])}`);
+  if (planLines.length) L.push('', '[기획]', ...planLines);
   L.push('');
   p.cuts.forEach((c, i) => {
     L.push(`#${pad2(i + 1)}  ${tc(starts[c.id], p.fps)}  ${sec(c.section).label}  ${fmtDur(c.dur)}  [${stat(c.status).label}]`);
@@ -1250,7 +1306,7 @@ async function importFile(file) {
 
 /* ---------- actions ---------- */
 function openProject(id) {
-  S.currentId = id; S.sheet = null; S.confirmDelete = false;
+  S.currentId = id; S.sheet = null; S.confirmDelete = false; S.zoom = null;
   saveUI(); render(); window.scrollTo(0, 0);
 }
 function createFrom(tplId) {
@@ -1333,6 +1389,10 @@ $app.addEventListener('input', e => {
   } else if (kind === 'chk' && field === 'text') {
     const item = p.checklist.find(x => x.id === id); if (!item) return;
     item.text = el.value;
+  } else if (kind === 'plan' && PLAN.some(f => f.id === id)) {
+    p.plan[id] = el.value;
+    const box = el.closest('.pf'); if (box) box.classList.toggle('filled', !!el.value.trim());
+    const pc = document.getElementById('planCount'); if (pc) pc.textContent = planFilled(p) + '/' + PLAN.length;
   } else if (kind === 'notes' && ['bgm', 'refs', 'memo'].includes(id)) {
     p.notes[id] = el.value;
     if (id === 'refs') { const r = document.getElementById('refs'); if (r) r.innerHTML = refsHTML(p); }
@@ -1372,6 +1432,18 @@ $app.addEventListener('keydown', e => {
   if (e.target.id === 'chkNew') { e.preventDefault(); const p = cur(); if (p) addChecklist(p); }
   else if (e.target.classList && e.target.classList.contains('title-in')) { e.preventDefault(); e.target.blur(); }
 });
+function setZoom(id) {
+  const prev = S.zoom;
+  S.zoom = id;
+  render();
+  if (id) {
+    const ta = document.getElementById('plan-' + id);
+    if (ta) { ta.focus({ preventScroll: true }); const n = ta.value.length; try { ta.setSelectionRange(n, n); } catch (e) { /* ignore */ } }
+  } else if (prev) {
+    const btn = $app.querySelector(`[data-k="b:zoom:${prev}"]`);
+    if (btn) { btn.closest('.pf').scrollIntoView({ block: 'center' }); btn.focus({ preventScroll: true }); }
+  }
+}
 function onClick(e) {
   const b = e.target.closest('[data-act]');
   if (!b || b.disabled) return;
@@ -1384,7 +1456,8 @@ function onClick(e) {
     case 'close-layer': closeLayer(); return;
     case 'open': openProject(b.dataset.id); return;
     case 'new': S.sheet = null; createFrom(b.dataset.v); return;
-    case 'tab': S.tab = b.dataset.v; saveUI(); render(); return;
+    case 'tab': S.tab = b.dataset.v; S.zoom = null; saveUI(); render(); return;
+    case 'zoom': setZoom(S.zoom === b.dataset.v ? null : b.dataset.v); return;
     case 'jump': jumpTo(b.dataset.cid); return;
     case 'export-all': exportAll(); return;
     case 'reload': flushAll(); $toast.hidden = true; setTimeout(() => location.reload(), 350); return;
@@ -1449,6 +1522,7 @@ $file.addEventListener('change', () => { const f = $file.files && $file.files[0]
 document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$layer.hidden) { closeLayer(); return; }
+  if (S.zoom) { setZoom(null); return; }
   if (S.sheet) { S.sheet = null; render(); }
 });
 document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') flushAll(); });

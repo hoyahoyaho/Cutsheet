@@ -1,6 +1,6 @@
 // 컷시트 service worker: keeps the app usable with no connection.
 // Change VERSION whenever any app file changes so phones pick up the update.
-const VERSION = 'cutsheet-v2';
+const VERSION = 'cutsheet-v3';
 const FONTS = 'cutsheet-fonts';
 const SHELL = ['./', './index.html', './config.js', './firebase.js', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 
